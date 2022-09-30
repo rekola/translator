@@ -30,3 +30,7 @@
 *.exe
 *.out
 *.app
+
+# Build and assets
+/build
+/assets
