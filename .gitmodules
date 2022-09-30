@@ -1,0 +1,9 @@
+[submodule "3rd_party/marian-dev"]
+	path = 3rd_party/marian-dev
+	url = https://github.com/marian-nmt/marian-dev.git
+[submodule "3rd_party/cpp-httplib"]
+	path = 3rd_party/cpp-httplib
+	url = https://github.com/yhirose/cpp-httplib.git
+[submodule "3rd_party/json"]
+	path = 3rd_party/json
+	url = https://github.com/nlohmann/json.git
