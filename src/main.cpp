@@ -21,12 +21,11 @@ int main(int argc, char ** argv) {
     if (req.has_param("source")) source = req.get_param_value("source");
     if (req.has_param("target")) target = req.get_param_value("target");
     if (req.has_param("format")) format = req.get_param_value("format");
-
-    cerr << "translating (" << source << " => " << target << ")\n";
     
     auto & translator = TranslationContext::getInstance();
-
     auto output = translator.translate(source, target, q);
+    
+    cerr << "translated (" << source << " => " << target << "): \"" << q << "\" => \"" << output << "\"\n";
     
     json translation;
     translation["translatedText"] = output;
