@@ -70,7 +70,7 @@ MarianTranslator::initialize() {
   // options->set<std::vector<int>>("dim-vocabs", { 0, 0 }); // use all
   options->set<std::vector<int>>("output-approx-knn", { 100, 1024 });
   options->set<std::vector<std::string>>("devices", { "0" });
-  options->set<size_t>("cpu-threads", 1);
+  options->set<size_t>("cpu-threads", 4);
   options->set<bool>("optimize", false);
   options->set<std::string>("gemm-type", "float32");
   options->set<float>("quantize-range", 0.f);
@@ -82,15 +82,18 @@ MarianTranslator::initialize() {
   options->set<bool>("right-left", false);
   options->set<bool>("model-mmap", false);
   options->set<bool>("word-scores", false);
+#if 1
+  options->set<float>("normalize", 0.6f);
+  options->set<size_t>("beam-size", 6);
+  options->set<int>("mini-batch", 64);
+  options->set<int>("maxi-batch", 100);
+#else
+  options->set<float>("normalize", 0.0f); // implicit = 1.0f, default = 0.0f
+  options->set<size_t>("beam-size", 12);
   options->set<int>("mini-batch", 1);
   options->set<int>("maxi-batch", 1);
-#if 0
-  options->set<size_t>("beam-size", 6);
-#else
-  options->set<size_t>("beam-size", 12);
 #endif
   options->set<float>("word-penalty", 0.0f);
-  options->set<float>("normalize", 0.0f); // implicit = 1.0f, default = 0.0f
   options->set<std::string>("factors-combine", "sum");
   options->set<int>("factors-dim-emb", 0);
   options->set<bool>("n-best", false);
