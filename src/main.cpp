@@ -2,6 +2,11 @@
 
 #include "TranslationContext.h"
 
+#ifdef WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+#endif
+
 #include <httplib.h>
 #include <nlohmann/json.hpp>
 
@@ -17,21 +22,26 @@ int main(int argc, char ** argv) {
     
   svr.Get("/translate", [](const httplib::Request & req, httplib::Response & res) {
     string q, source, target, format;
-    if (req.has_param("q")) q = req.get_param_value("q");
     if (req.has_param("source")) source = req.get_param_value("source");
     if (req.has_param("target")) target = req.get_param_value("target");
     if (req.has_param("format")) format = req.get_param_value("format");
+
+    auto num_input = req.get_param_value_count("q");
+    std::vector<std::string> input;
+    input.reserve(num_input);
+    for (size_t i = 0; i < num_input; i++) input.push_back(req.get_param_value("q", i));
     
     auto & translator = TranslationContext::getInstance();
-    auto output = translator.translate(source, target, q);
-    
-    cerr << "translated (" << source << " => " << target << "): \"" << q << "\" => \"" << output << "\"\n";
-    
-    json translation;
-    translation["translatedText"] = output;
-    
     json translations;
-    translations.push_back(translation);
+
+    for (auto & s : input) {
+      auto output = translator.translate(source, target, s);
+      cerr << "translated (" << source << " => " << target << "): \"" << s << "\" => \"" << output << "\"\n";
+
+      json translation;
+      translation["translatedText"] = output;
+      translations.push_back(translation);
+    }
     
     json payload;
     payload["data"]["translations"] = translations;
@@ -43,7 +53,7 @@ int main(int argc, char ** argv) {
     res.set_content("Nothing here.", "text/plain");
   });
 
-  svr.listen("localhost", 8080);
+  svr.listen("0.0.0.0", 8080);
 
   return 0;
 }
