@@ -31,7 +31,7 @@ class TranslationContext {
   }
   
   std::string translate(const std::string & source_lang, const std::string & target_lang, const std::string & input) {
-    const std::lock_guard<std::mutex> lock(translation_mutex);
+    const std::lock_guard<std::mutex> lock(translation_mutex_);
     return getTranslator(source_lang, target_lang).translate(input);
   }
     
@@ -56,7 +56,7 @@ class TranslationContext {
 
   std::unordered_map<std::string, std::unordered_map<std::string, std::unique_ptr<Translator> > > translators_;
   PassthroughTranslator null_translator_;
-  std::mutex translation_mutex;
+  std::mutex translation_mutex_;
 
   static std::mutex instance_mutex;
   static std::atomic<TranslationContext *> instance;
