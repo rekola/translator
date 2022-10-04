@@ -70,7 +70,11 @@ MarianTranslator::initialize() {
   // options->set<std::vector<int>>("dim-vocabs", { 0, 0 }); // use all
   options->set<std::vector<int>>("output-approx-knn", { 100, 1024 });
   options->set<std::vector<std::string>>("devices", { "0" });
+#if 0
+  options->set<size_t>("cpu-threads", 0);
+#else
   options->set<size_t>("cpu-threads", 4);
+#endif
   options->set<bool>("optimize", false);
   options->set<std::string>("gemm-type", "float32");
   options->set<float>("quantize-range", 0.f);
