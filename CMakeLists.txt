@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 # set the project name
-project(m22 VERSION 1.1.24)
+project(translator VERSION 1.1.24)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -32,32 +32,35 @@ if(MSVC)
     add_compile_options("$<$<CONFIG:DEBUG>:/MDd>")  # error LNK2038
 endif()
 
-# Disable CUDA for Marian by default
+# Enable CUDA for Marian by default
 set(COMPILE_CUDA OFF CACHE BOOL "Compile GPU version")
+set(COMPILE_CUDA OFF)
 
 add_subdirectory(3rd_party)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -O3 -Wall -Wsuggest-override -Werror=return-local-addr -Werror=multichar -Werror=enum-compare -Werror=return-type -Werror=conversion-null -Werror=parentheses  -Werror=address -Werror=trigraphs -Werror=pointer-arith -ffast-math -fno-math-errno -Werror=write-strings -Werror=return-local-addr -Werror=pessimizing-move -Wuninitialized -Wno-suggest-override -Wno-unknown-pragmas -Werror=switch -Werror=format -I../../fastText/src")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -O3 -Wall -Wsuggest-override -Werror=return-local-addr -Werror=multichar -Werror=enum-compare -Werror=return-type -Werror=conversion-null -Werror=parentheses  -Werror=address -Werror=trigraphs -Werror=pointer-arith -ffast-math -fno-math-errno -Werror=write-strings -Werror=return-local-addr -Wuninitialized -Wno-suggest-override -Wno-unknown-pragmas -Werror=switch -Werror=format -I../../m22/src")
 
-# -Werror=non-virtual-dtor -Werror=cast-qual -Wconversion -Wsign-conversion -Wsign-promo -Wno-float-conversion
+# -Werror=pessimizing-move -Werror=non-virtual-dtor -Werror=cast-qual -Wconversion -Wsign-conversion -Wsign-promo -Wno-float-conversion
 
 # add the executable
 add_executable(translator
   	src/main.cpp
 	src/TranslationContext.cpp
 	src/MarianTranslator.cpp
-	../fastText/src/fasttext.cc
-	../fastText/src/matrix.cc
-	../fastText/src/dictionary.cc
-	../fastText/src/loss.cc
-	../fastText/src/productquantizer.cc
-	../fastText/src/densematrix.cc
-	../fastText/src/quantmatrix.cc
-	../fastText/src/vector.cc
-	../fastText/src/model.cc
-	../fastText/src/utils.cc
-	../fastText/src/args.cc
-	../fastText/src/meter.cc
+	src/LanguageDetector.cpp
+	../m22/src/language/Tokenizer.cpp
+	3rd_party/fastText/src/fasttext.cc
+	3rd_party/fastText/src/matrix.cc
+	3rd_party/fastText/src/dictionary.cc
+	3rd_party/fastText/src/loss.cc
+	3rd_party/fastText/src/productquantizer.cc
+	3rd_party/fastText/src/densematrix.cc
+	3rd_party/fastText/src/quantmatrix.cc
+	3rd_party/fastText/src/vector.cc
+	3rd_party/fastText/src/model.cc
+	3rd_party/fastText/src/utils.cc
+	3rd_party/fastText/src/args.cc
+	3rd_party/fastText/src/meter.cc
 )
 
 
@@ -67,5 +70,6 @@ target_include_directories(translator
   PUBLIC src/
   3rd_party/cpp-httplib
   3rd_party/json/single_include
+  3rd_party/fastText/src
   )
 
