@@ -47,7 +47,7 @@ add_executable(translator
   	src/main.cpp
 	src/TranslationContext.cpp
 	src/MarianTranslator.cpp
-	src/LanguageDetector.cpp
+	../m22/src/language/LanguageDetector.cpp
 	../m22/src/language/Tokenizer.cpp
 	3rd_party/fastText/src/fasttext.cc
 	3rd_party/fastText/src/matrix.cc
