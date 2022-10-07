@@ -1,6 +1,9 @@
+#define CPPHTTPLIB_FORM_URL_ENCODED_PAYLOAD_MAX_LENGTH (512*1024*1024)
 // #define CPPHTTPLIB_OPENSSL_SUPPORT
 
 #include "TranslationContext.h"
+
+#include <language/LanguageDetector.h>
 
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -27,21 +30,43 @@ int main(int argc, char ** argv) {
 		   if (req.has_param("source")) source = req.get_param_value("source");
 		   if (req.has_param("target")) target = req.get_param_value("target");
 		   if (req.has_param("format")) format = req.get_param_value("format");
-		   
+
+		   auto & detector = LanguageDetector::getInstance();
+
 		   auto num_input = req.get_param_value_count("q");
-		   std::vector<std::string> input;
-		   input.reserve(num_input);
-		   for (size_t i = 0; i < num_input; i++) input.push_back(req.get_param_value("q", i));
-		   
+		   std::unordered_map<std::string, std::vector<std::pair<std::string, size_t>>> input;
+		   for (size_t i = 0; i < num_input; i++) {
+		     auto text = req.get_param_value("q", i);
+		     auto lang = !source.empty() ? source : detector.detectLanguage(text);
+		     input[lang].push_back(pair(text, i));
+		   }
+
+		   std::vector<pair<string, string>> output;
+		   output.resize(num_input);
+				 
 		   auto & translator = TranslationContext::getInstance();
+		   for (auto & [ lang, data ] : input) {
+		     std::vector<std::string> data2;
+		     for (auto & [s, pos] : data) data2.push_back(s);
+		     auto data3 = translator.translate(lang, target, data2);
+		     for (size_t i = 0; i < data.size(); i++) {
+		       auto & [s, pos] = data[i];
+		       std::string s2;
+		       if (i < data3.size()) {
+			 s2 = std::move(data3[i]);
+		       }
+		       cerr << "translated (" << lang << " => " << target << "): \"" << s << "\" => \"" << s2 << "\"\n";
+		       output[pos] = pair(s2, lang);
+		     }
+		   }
+		   
 		   json translations;
 		   
-		   for (auto & s : input) {
-		     auto output = translator.translate(source, target, s);
-		     cerr << "translated (" << source << " => " << target << "): \"" << s << "\" => \"" << output << "\"\n";
-		     
+		   for (auto & [s, lang] : output) {
 		     json translation;
-		     translation["translatedText"] = output;
+		     if (!s.empty()) translation["translatedText"] = s;
+		     if (source.empty()) translation["detectedSourceLanguage"] = lang;
+		     
 		     translations.push_back(translation);
 		   }
 		   
