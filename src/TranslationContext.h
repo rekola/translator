@@ -5,6 +5,7 @@
 #include <mutex>
 #include <unordered_map>
 #include <atomic>
+#include <vector>
 
 #include "Translator.h"
 
@@ -34,17 +35,26 @@ class TranslationContext {
     const std::lock_guard<std::mutex> lock(translation_mutex_);
     return getTranslator(source_lang, target_lang).translate(input);
   }
-    
+
+  std::vector<std::string> translate(const std::string & source_lang, const std::string & target_lang, const std::vector<std::string> & input) {
+    const std::lock_guard<std::mutex> lock(translation_mutex_);
+    return getTranslator(source_lang, target_lang).translate(input);
+  }
+
  protected:
   Translator & getTranslator(const std::string & source, const std::string & target) {
-    auto it = translators_.find(source);
-    if (it != translators_.end()) {
-      auto it2 = it->second.find(target);
-      if (it2 != it->second.end()) {
-	return *(it2->second);
+    if (source == target) {
+      return passthrough_translator_;
+    } else {
+      auto it = translators_.find(source);
+      if (it != translators_.end()) {
+	auto it2 = it->second.find(target);
+	if (it2 != it->second.end()) {
+	  return *(it2->second);
+	}
       }
+      return null_translator_;
     }
-    return null_translator_;
   }
 
  private:
@@ -55,7 +65,8 @@ class TranslationContext {
   }
 
   std::unordered_map<std::string, std::unordered_map<std::string, std::unique_ptr<Translator> > > translators_;
-  PassthroughTranslator null_translator_;
+  PassthroughTranslator passthrough_translator_;
+  NullTranslator null_translator_;
   std::mutex translation_mutex_;
 
   static std::mutex instance_mutex;

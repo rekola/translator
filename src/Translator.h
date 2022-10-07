@@ -2,6 +2,7 @@
 #define _TRANSLATOR_H_
 
 #include <string>
+#include <vector>
 
 class Translator {
  public:
@@ -9,6 +10,13 @@ class Translator {
   virtual ~Translator() { }
   
   virtual std::string translate(const std::string & input) = 0;
+  virtual std::vector<std::string> translate(const std::vector<std::string> & input) {
+    std::vector<std::string> r;
+    for (auto & s : input) {
+      r.push_back(translate(s));
+    }
+    return r;
+  }
 
   const std::string & getSourceLang() const { return source_lang_; }
   const std::string & getTargetLang() const { return target_lang_; }
@@ -23,5 +31,12 @@ public:
 
   std::string translate(const std::string & input) override { return input; }
 };
-  
+
+class NullTranslator : public Translator {
+public:
+  NullTranslator() : Translator("", "") { }
+
+  std::string translate(const std::string & input) override { return std::string(); }
+};
+
 #endif
