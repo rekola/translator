@@ -12,4 +12,5 @@ TranslationContext::TranslationContext() {
   addTranslator(std::make_unique<MarianTranslator>("et", "en"));
   addTranslator(std::make_unique<MarianTranslator>("ru", "en"));
   addTranslator(std::make_unique<MarianTranslator>("de", "en"));
+  addTranslator(std::make_unique<MarianTranslator>("uk", "en"));
 }
