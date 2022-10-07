@@ -6,7 +6,13 @@ using namespace std;
 using namespace marian;    
 
 MarianTranslator::MarianTranslator(std::string source_lang, std::string target_lang)
-  : Translator(source_lang, target_lang) { }
+  : Translator(source_lang, target_lang), tokenizer_(source_lang)
+{
+  tokenizer_.skipWhitespace(true);
+  tokenizer_.normalizeWords(false);
+  tokenizer_.stripEndings(false);
+  tokenizer_.setLinkMode(Tokenizer::KEEP);
+}
 
 void
 MarianTranslator::initialize() {
@@ -29,7 +35,7 @@ MarianTranslator::initialize() {
   } else if (false && (getSourceLang() == "fi" || getSourceLang() == "sv") && getTargetLang() == "en") {
     
   } else {
-    // (sv,et,ru,de)-en
+    // (sv,et,ru,de,uk)-en
     vocab = model_dir + "/opus.spm32k-spm32k.vocab.yml";
     model = model_dir + "/opus.spm32k-spm32k.transformer-align.model1.npz.best-perplexity.npz";
   }
@@ -172,18 +178,6 @@ MarianTranslator::initialize() {
   task_ = New<TranslateService<BeamSearch>>(options);
 }
 
-static std::vector<std::string> split_string(const std::string & line, const char * delimiters, bool keep_delimiters = false) {
-  std::vector<std::string> r;
-  size_t pos0 = 0;
-  while (pos0 < line.size()) {
-    auto pos1 = line.find_first_of(delimiters, pos0);
-    if (pos1 == string::npos) pos1 = line.size();
-    if (pos0 < pos1) r.push_back(line.substr(pos0, pos1 - pos0 + (keep_delimiters ? 1 : 0)));
-    pos0 = pos1 + 1;
-  }
-  return r;
-}
-
 static void inline replace(std::string & data, const std::string from, const std::string & to) {
   std::string::size_type pos = 0;
   while ( 1 ) {
@@ -194,7 +188,7 @@ static void inline replace(std::string & data, const std::string from, const std
   }
 }
 
-static void preprocess(std::string & input) {
+static std::string preprocess(std::string input) {
   replace(input, "，", ",");
   replace(input, "。", ".");
   replace(input, "．", ".");
@@ -237,7 +231,9 @@ static void preprocess(std::string & input) {
     if (c >= 0 && c < 32) c = ' ';
   }
   
-  // concatenate spaces    
+  // concatenate spaces
+
+  return input;
 }
 
 std::string
@@ -257,6 +253,18 @@ MarianTranslator::encodeSentencePiece(const std::string & input) {
   return encoded_input;
 }
 
+static std::vector<std::string> split_string(const std::string & line, const char * delimiters, bool keep_delimiters = false) {
+  std::vector<std::string> r;
+  size_t pos0 = 0;
+  while (pos0 < line.size()) {
+    auto pos1 = line.find_first_of(delimiters, pos0);
+    if (pos1 == string::npos) pos1 = line.size();
+    if (pos0 < pos1) r.push_back(line.substr(pos0, pos1 - pos0 + (keep_delimiters ? 1 : 0)));
+    pos0 = pos1 + 1;
+  }
+  return r;
+}
+
 std::string
 MarianTranslator::decodeSentencePiece(const std::string & input0) {
 #if 1
@@ -272,20 +280,96 @@ MarianTranslator::decodeSentencePiece(const std::string & input0) {
 #endif
 }
 
+std::vector<std::string>
+MarianTranslator::translateBatch(const std::vector<std::string> & sentences) {
+  cerr << "encoding sentences\n";
+  // std::vector<std::string> sentences2;
+  std::string sentences2;
+  for (auto & sentence : sentences) {
+    sentences2 += encodeSentencePiece(preprocess(sentence)) + "\n";
+  }
+
+  cerr << "query: " << sentences2 << "\n";
+  cerr << "running task\n";
+  auto tmp = task_->run(sentences2);
+  cerr << "result: " << tmp << "\n";
+  auto sentences3 = split_string(tmp, "\n");
+
+  std::vector<std::string> r;
+  cerr << "collecting results\n";
+  for (auto & sentence : sentences3) {
+    r.push_back(decodeSentencePiece(sentence));
+  }
+  return r;
+}
+
 std::string
 MarianTranslator::translate(const std::string & input) {
   initialize();
-  
-  auto sentences = split_string(input, "!?.", true);
-  std::string output;
-  for (auto & sentence : sentences) {
-    preprocess(sentence);
-    
-    auto sp = encodeSentencePiece(sentence);
-    cerr << "translating sentence: " << sentence << ": " << sp << "\n";
-    auto r = decodeSentencePiece(task_->run(sp));
-    if (!output.empty()) output += " ";
-    output += r;
+
+  auto tokens = tokenizer_.tokenize(input);
+
+  std::vector<std::string> sentences;
+  bool is_open = false;
+  for (auto & token : tokens) {
+    if (sentences.empty() || !is_open) {
+      sentences.emplace_back();
+      is_open = true;
+    }
+    if (!sentences.back().empty()) sentences.back() += ' ';
+    sentences.back() += token;
+    if (token == "." || token == "?" || token == "!") is_open = false;
   }
+
+  auto sentences2 = translateBatch(sentences);
+
+  std::string output;
+  for (auto & s : sentences2) {
+    if (!output.empty()) output += " ";
+    output += s;
+  }
+
+  return output;
+}
+
+std::vector<std::string>
+MarianTranslator::translate(const std::vector<std::string> & input) {
+  std::vector<std::string> sentences;
+  std::vector<bool> is_new_paragraph;
+  bool is_open = false;
+
+  initialize();
+  
+  cerr << "step: " << input.size() << "\n";
+  
+  for (auto & paragraph : input) {
+    auto tokens = tokenizer_.tokenize(paragraph);
+
+    bool is_first = true;
+    for (auto & token : tokens) {
+      if (sentences.empty() || !is_open || is_first) {
+	sentences.emplace_back();
+	is_new_paragraph.push_back(is_first);
+	is_open = true;
+	is_first = false;
+      }
+      if (!sentences.back().empty()) sentences.back() += ' ';
+      sentences.back() += token;
+      if (token == "." || token == "?" || token == "!") is_open = false;
+    }
+  }
+  
+  cerr << "step2: " << sentences.size() << "\n";
+  auto sentences2 = translateBatch(sentences);
+
+  cerr << "step3: " << sentences2.size() << ", f = " << is_new_paragraph.front() << "\n";
+  
+  std::vector<std::string> output;
+  for (size_t i = 0; i < sentences2.size(); i++) {
+    if (i < is_new_paragraph.size() && is_new_paragraph[i]) output.emplace_back();
+    else if (output.back().empty()) output.back() += " ";
+    output.back() += sentences2[i];
+  }
+
   return output;
 }
