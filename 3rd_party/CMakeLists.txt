@@ -3,6 +3,7 @@ set(COMPILE_TESTS OFF)
 set(COMPILE_EXAMPLES OFF)
 set(USE_DOXYGEN OFF)
 set(USE_MPI OFF)
+set(USE_STATIC_LIBS OFF)
 
 add_subdirectory(marian-dev EXCLUDE_FROM_ALL)
 
