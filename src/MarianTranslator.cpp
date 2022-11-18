@@ -1,12 +1,12 @@
 #include "MarianTranslator.h"
 
-#include <iostream>
+#include <fmt/core.h>
 
 using namespace std;
 using namespace marian;    
 
 MarianTranslator::MarianTranslator(std::string source_lang, std::string target_lang)
-  : Translator(source_lang, target_lang), tokenizer_(source_lang)
+  : Translator(source_lang, std::move(target_lang)), tokenizer_(std::move(source_lang))
 {
   tokenizer_.skipWhitespace(true);
   tokenizer_.normalizeWords(false);
@@ -35,17 +35,17 @@ MarianTranslator::initialize() {
   } else if (false && (getSourceLang() == "fi" || getSourceLang() == "sv") && getTargetLang() == "en") {
     
   } else {
-    // (sv,et,ru,de,uk)-en
+    // (sv,et,ru,de,uk)-en, fi-ru
     vocab = model_dir + "/opus.spm32k-spm32k.vocab.yml";
     model = model_dir + "/opus.spm32k-spm32k.transformer-align.model1.npz.best-perplexity.npz";
   }
 
-  cerr << "loading source spm\n";
+  fmt::print(stderr, "loading source spm\n");
+  
   source_spm_ = make_unique<sentencepiece::SentencePieceProcessor>();
   source_spm_->Load(source_model);
 
 #if 0
-  cerr << "loading target spm\n";
   target_spm_ = make_unique<sentencepiece::SentencePieceProcessor>();
   target_spm_->Load(target_model);
 #endif
@@ -61,7 +61,7 @@ MarianTranslator::initialize() {
   args.push_back("--cpu-threads");
   args.push_back("1");
 
-  cerr << "loading options\n";
+  fmt::print(stderr, "loading options\n");
 
   ConfigParser cp(cli::mode::server);
   auto options = cp.parseOptions(args.size(), const_cast<char **>(args.data()), true);
@@ -84,7 +84,6 @@ MarianTranslator::initialize() {
   options->set<bool>("optimize", false);
   options->set<std::string>("gemm-type", "float32");
   options->set<float>("quantize-range", 0.f);
-  options->set<int>("workspace", 512);
   options->set<bool>("ignore-model-config", false);
   options->set<bool>("skip-cost", false);
   options->set<size_t>("max-length", 1000);
@@ -97,11 +96,15 @@ MarianTranslator::initialize() {
   options->set<size_t>("beam-size", 6);
   options->set<int>("mini-batch", 64);
   options->set<int>("maxi-batch", 100);
+  options->set<std::string>("maxi-batch-sort", "src");
+  options->set<int>("workspace", 2500);
 #else
   options->set<float>("normalize", 0.0f); // implicit = 1.0f, default = 0.0f
   options->set<size_t>("beam-size", 12);
   options->set<int>("mini-batch", 1);
   options->set<int>("maxi-batch", 1);
+  options->set<std::string>("maxi-batch-sort", "none");
+  options->set<int>("workspace", 512);
 #endif
   options->set<float>("word-penalty", 0.0f);
   options->set<std::string>("factors-combine", "sum");
@@ -152,12 +155,6 @@ MarianTranslator::initialize() {
   options->set<float>("bert-masking-fraction", 0.15f);
   options->set<bool>("bert-train-type-embeddings", true);
   options->set<int>("bert-type-vocab-size", 2);
-
-#if 0
-  options->set<std::string>("maxi-batch-sort", "src");
-#else
-  options->set<std::string>("maxi-batch-sort", "none");
-#endif
   options->set<size_t>("data-threads", 8); // 1 for deterministic
   
   // options->set<int>("char-stride",
@@ -174,7 +171,8 @@ MarianTranslator::initialize() {
   //     {1, 2, 3, 4, 5, 6, 7, 8});
 
 #endif
-  cerr << "loading model: " << model << "\n";
+  fmt::print(stderr, "loading model {}\n", model);
+  
   task_ = New<TranslateService<BeamSearch>>(options);
 }
 
@@ -226,12 +224,15 @@ static std::string preprocess(std::string input) {
   replace(input, "】", "]");
   replace(input, "％", "%");
 
-  // remove control characters
+  // extra
+#if 0
+  replace(input, ";", ",");
+#endif
+  
+  // remove control characters (including spaces)
   for (auto & c : input) {
     if (c >= 0 && c < 32) c = ' ';
   }
-  
-  // concatenate spaces
 
   return input;
 }
@@ -282,21 +283,16 @@ MarianTranslator::decodeSentencePiece(const std::string & input0) {
 
 std::vector<std::string>
 MarianTranslator::translateBatch(const std::vector<std::string> & sentences) {
-  cerr << "encoding sentences\n";
   // std::vector<std::string> sentences2;
   std::string sentences2;
   for (auto & sentence : sentences) {
     sentences2 += encodeSentencePiece(preprocess(sentence)) + "\n";
   }
 
-  cerr << "query: " << sentences2 << "\n";
-  cerr << "running task\n";
   auto tmp = task_->run(sentences2);
-  cerr << "result: " << tmp << "\n";
   auto sentences3 = split_string(tmp, "\n");
 
   std::vector<std::string> r;
-  cerr << "collecting results\n";
   for (auto & sentence : sentences3) {
     r.push_back(decodeSentencePiece(sentence));
   }
@@ -332,6 +328,17 @@ MarianTranslator::translate(const std::string & input) {
   return output;
 }
 
+static inline bool is_punctuation(const std::string & token) {
+  return token == "," || token == "." || token == ";" || token == "!" || token == "?" || token == ")" || token == "]" || token == ":";
+}
+
+static inline bool needs_space_right(const std::string & text) {
+  if (text.empty()) return false;
+  auto last_char = text.back();
+  if (last_char == '(' || last_char == '[') return false;
+  return true;
+}
+
 std::vector<std::string>
 MarianTranslator::translate(const std::vector<std::string> & input) {
   std::vector<std::string> sentences;
@@ -339,9 +346,7 @@ MarianTranslator::translate(const std::vector<std::string> & input) {
   bool is_open = false;
 
   initialize();
-  
-  cerr << "step: " << input.size() << "\n";
-  
+    
   for (auto & paragraph : input) {
     auto tokens = tokenizer_.tokenize(paragraph);
 
@@ -353,16 +358,13 @@ MarianTranslator::translate(const std::vector<std::string> & input) {
 	is_open = true;
 	is_first = false;
       }
-      if (!sentences.back().empty()) sentences.back() += ' ';
+      if (needs_space_right(sentences.back()) && !is_punctuation(token)) sentences.back() += ' ';
       sentences.back() += token;
       if (token == "." || token == "?" || token == "!") is_open = false;
     }
   }
-  
-  cerr << "step2: " << sentences.size() << "\n";
-  auto sentences2 = translateBatch(sentences);
 
-  cerr << "step3: " << sentences2.size() << ", f = " << is_new_paragraph.front() << "\n";
+  auto sentences2 = translateBatch(sentences);
   
   std::vector<std::string> output;
   for (size_t i = 0; i < sentences2.size(); i++) {
