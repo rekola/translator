@@ -41,8 +41,6 @@ int main(int argc, char ** argv) {
       input[lang].push_back(pair(text, i));
     }
 
-    std::cerr << "input size: " << num_input << "\n";
-
     std::vector<pair<string, string>> output;
     output.resize(num_input);
 				 
@@ -57,7 +55,6 @@ int main(int argc, char ** argv) {
 	if (i < data3.size()) {
 	  s2 = std::move(data3[i]);
 	}
-	cerr << "translated (" << lang << " => " << target << "): \"" << s << "\" => \"" << s2 << "\"\n";
 	output[pos] = pair(s2, lang);
       }
     }
