@@ -6,7 +6,7 @@
 
 class Translator {
  public:
-  Translator(std::string source_lang, std::string target_lang) : source_lang_(source_lang), target_lang_(target_lang) { }
+  Translator(std::string source_lang, std::string target_lang) : source_lang_(std::move(source_lang)), target_lang_(std::move(target_lang)) { }
   virtual ~Translator() { }
   
   virtual std::string translate(const std::string & input) = 0;
