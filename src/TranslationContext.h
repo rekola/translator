@@ -4,7 +4,6 @@
 #include <memory>
 #include <mutex>
 #include <unordered_map>
-#include <atomic>
 #include <vector>
 
 #include "Translator.h"
@@ -17,18 +16,8 @@ class TranslationContext {
   TranslationContext & operator=(const TranslationContext && other) = delete;
 
   static TranslationContext & getInstance() {
-    auto ptr = instance.load();
-    if (ptr) return *ptr;
-    else {      
-      const std::lock_guard<std::mutex> lock(instance_mutex);
-      auto ptr2 = instance.load();
-      if (ptr2) return *ptr2;
-      else {
-	auto mgr = new TranslationContext();
-	instance.store(mgr);
-	return *mgr;
-      }
-    }
+    static TranslationContext instance;
+    return instance;
   }
   
   std::string translate(const std::string & source_lang, const std::string & target_lang, const std::string & input) {
@@ -68,9 +57,6 @@ class TranslationContext {
   PassthroughTranslator passthrough_translator_;
   NullTranslator null_translator_;
   std::mutex translation_mutex_;
-
-  static std::mutex instance_mutex;
-  static std::atomic<TranslationContext *> instance;
 };
 
 #endif
