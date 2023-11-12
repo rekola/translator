@@ -50,6 +50,29 @@ cmake ../ -DCOMPILE_CUDA=on
 
 Access the url ```http://localhost:8080/translate?q=Hello%20world&target=fi``` to test.
 
+## API
+
+### Endpoints
+
+| Path | Description |
+| - | - |
+| /translate | Translates input from source to target language |
+
+### /translate
+
+| Parameter | Required | Description |
+| - | - |
+| source | No | Source language. If missing, the language is autodetected |
+| target | Yes | Target language (e.g. en) |
+| q | Yes | Input text. Can be used multiple times. |
+| format | No | Output format. Not used. |
+
+#### Response
+
+```json
+{"data":{"translations":[{"detectedSourceLanguage":"en","translatedText":" Hei maailma"}]}}
+```
+
 ## Known issues
 
 - Duplicate parameters are ignored, which means that you cannot translate the same text multiple times.
