@@ -1,18 +1,30 @@
 # translator
 
-Machine Translation Service
+Machine Translation Service based on MarianNMT. The project is a
+microservice that contains a web server that provides a REST based
+HTTP API for machine translation. The API is similar to the Google
+translation API. This is a work in progress.
 
-# Install dependencies
+## Dependencies
 
-m22 repositoriy must be cloned in ../m22 directory
+- MarianNMT
+- OpenBLAS
+- {fmt}
+- fastText
+- cpp-httplib
 
+## Assets
+
+## Installation
+
+### Install dependencies (Ubuntu)
 ```
 apt install libopenblas-dev
 apt install fmt-dev
 apt install libfasttext-dev
 ```
 
-## Compilation (CPU)
+### Compilation (CPU)
 
 ```
 mkdir build
@@ -20,13 +32,21 @@ cd build
 cmake ../ -DCOMPILE_CPU=on
 ```
 
-## Compilation (GPU)
+### Compilation (GPU)
 
 ```
 mkdir build
 cd build
 cmake ../ -DCOMPILE_CUDA=on
 ```
+
+## Running
+
+```
+./translator
+```
+
+Access the url ```http://localhost:8080/translate?q=Hello%20world&target=fi``` to test.
 
 ## Known issues
 
