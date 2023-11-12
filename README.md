@@ -2,8 +2,7 @@
 
 Machine Translation Service based on MarianNMT. The project is a
 microservice that contains a web server that provides a REST based
-HTTP API for machine translation. The API is similar to the Google
-translation API. This is a work in progress.
+HTTP API for machine translation. This is a work in progress.
 
 ## Dependencies
 
@@ -12,16 +11,19 @@ translation API. This is a work in progress.
 - {fmt}
 - fastText
 - cpp-httplib
+- utf8proc
+- nlohmann::json
 
 ## Assets
 
-## Installation
+Language assets are hardcoded in the program. You must ensure that the needed assets are present in the assets subdirectory.
 
-### Install dependencies (Ubuntu)
+## Installation (Ubuntu)
+
+### Install dependencies
+
 ```
-apt install libopenblas-dev
-apt install fmt-dev
-apt install libfasttext-dev
+sudo apt install libutf8proc-dev libopenblas-dev fmt-dev libfasttext-dev
 ```
 
 ### Compilation (CPU)
