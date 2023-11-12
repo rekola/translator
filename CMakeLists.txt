@@ -38,7 +38,7 @@ set(COMPILE_CUDA OFF)
 
 add_subdirectory(3rd_party)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -O3 -Wall -Wsuggest-override -Werror=return-local-addr -Werror=multichar -Werror=enum-compare -Werror=return-type -Werror=conversion-null -Werror=parentheses  -Werror=address -Werror=trigraphs -Werror=pointer-arith -ffast-math -fno-math-errno -Werror=write-strings -Werror=return-local-addr -Wuninitialized -Wno-suggest-override -Wno-unknown-pragmas -Werror=switch -Werror=format -I../../m22/src")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -O3 -Wall -Wsuggest-override -Werror=return-local-addr -Werror=multichar -Werror=enum-compare -Werror=return-type -Werror=conversion-null -Werror=parentheses  -Werror=address -Werror=trigraphs -Werror=pointer-arith -ffast-math -fno-math-errno -Werror=write-strings -Werror=return-local-addr -Wuninitialized -Wno-suggest-override -Wno-unknown-pragmas -Werror=switch -Werror=format")
 
 # -Werror=pessimizing-move -Werror=non-virtual-dtor -Werror=cast-qual -Wconversion -Wsign-conversion -Wsign-promo -Wno-float-conversion
 
@@ -47,8 +47,8 @@ add_executable(translator
   	src/main.cpp
 	src/TranslationContext.cpp
 	src/MarianTranslator.cpp
-	../m22/src/language/LanguageDetector.cpp
-	../m22/src/language/Tokenizer.cpp
+	src/LanguageDetector.cpp
+	src/Tokenizer.cpp
 	3rd_party/fastText/src/fasttext.cc
 	3rd_party/fastText/src/matrix.cc
 	3rd_party/fastText/src/dictionary.cc
