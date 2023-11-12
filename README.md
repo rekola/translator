@@ -18,6 +18,14 @@ HTTP API for machine translation. This is a work in progress.
 
 Language assets are hardcoded in the program. You must ensure that the needed assets are present in the assets subdirectory.
 
+### fastText model for language detection
+
+Place lid.176.ftz in assets directory (download link: https://fasttext.cc/docs/en/language-identification.html)
+
+### Hardcoded language models
+
+
+
 ## Installation (Ubuntu)
 
 ### Install dependencies
@@ -61,7 +69,7 @@ Access the url ```http://localhost:8080/translate?q=Hello%20world&target=fi``` t
 ### /translate
 
 | Parameter | Required | Description |
-| - | - |
+| - | - | - |
 | source | No | Source language. If missing, the language is autodetected |
 | target | Yes | Target language (e.g. en) |
 | q | Yes | Input text. Can be used multiple times. |
