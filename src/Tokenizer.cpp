@@ -1,6 +1,6 @@
 #include "Tokenizer.h"
 
-#include "../text_utils.h"
+#include "text_utils.h"
 
 using namespace std;
 

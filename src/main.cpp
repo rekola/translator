@@ -3,7 +3,7 @@
 
 #include "TranslationContext.h"
 
-#include <language/LanguageDetector.h>
+#include "LanguageDetector.h"
 
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN

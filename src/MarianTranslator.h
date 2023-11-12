@@ -8,7 +8,7 @@
 #include "translator/translator.h"
 #include "sentencepiece/src/sentencepiece_processor.h"
 
-#include <language/Tokenizer.h>
+#include "Tokenizer.h"
 
 #include <memory>
 

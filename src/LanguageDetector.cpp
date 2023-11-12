@@ -10,9 +10,9 @@
 #include <fasttext/fasttext.h>
 #endif
 
-#include "../text_utils.h"
-
 #include <fmt/core.h>
+
+#include "text_utils.h"
 
 using namespace std;
 

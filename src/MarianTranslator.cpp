@@ -6,7 +6,7 @@ using namespace std;
 using namespace marian;    
 
 MarianTranslator::MarianTranslator(std::string source_lang, std::string target_lang)
-  : Translator(source_lang, std::move(target_lang)), tokenizer_(std::move(source_lang))
+  : Translator(std::move(source_lang), std::move(target_lang))
 {
   tokenizer_.skipWhitespace(true);
   tokenizer_.normalizeWords(false);
@@ -40,7 +40,9 @@ MarianTranslator::initialize() {
     model = model_dir + "/opus.spm32k-spm32k.transformer-align.model1.npz.best-perplexity.npz";
   }
 
+#if 0
   fmt::print(stderr, "loading source spm\n");
+#endif
   
   source_spm_ = make_unique<sentencepiece::SentencePieceProcessor>();
   source_spm_->Load(source_model);
@@ -303,7 +305,7 @@ std::string
 MarianTranslator::translate(const std::string & input) {
   initialize();
 
-  auto tokens = tokenizer_.tokenize(input);
+  auto tokens = tokenizer_.tokenize(getSourceLang(), input);
 
   std::vector<std::string> sentences;
   bool is_open = false;
@@ -348,7 +350,7 @@ MarianTranslator::translate(const std::vector<std::string> & input) {
   initialize();
     
   for (auto & paragraph : input) {
-    auto tokens = tokenizer_.tokenize(paragraph);
+    auto tokens = tokenizer_.tokenize(getSourceLang(), paragraph);
 
     bool is_first = true;
     for (auto & token : tokens) {
