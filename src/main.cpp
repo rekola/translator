@@ -43,7 +43,7 @@ int main(int argc, char ** argv) {
 
     std::vector<pair<string, string>> output;
     output.resize(num_input);
-				 
+    
     auto & translator = TranslationContext::getInstance();
     for (auto & [ lang, data ] : input) {
       std::vector<std::string> data2;
@@ -58,26 +58,22 @@ int main(int argc, char ** argv) {
 	output[pos] = pair(s2, lang);
       }
     }
-		   
+    
     json translations;
-		   
+    
     for (auto & [s, lang] : output) {
       json translation = json::object();
       // if (!orig.empty()) translation["originalText"] = orig;
       if (!s.empty()) translation["translatedText"] = s;
       if (source.empty() && !lang.empty()) translation["detectedSourceLanguage"] = lang;
-		     
+      
       translations.push_back(translation);
     }
-		   
+    
     json payload;
     payload["data"]["translations"] = translations;
-		   
+    
     res.set_content(payload.dump(), "application/json");
-  };
-  
-  auto search_handler = [](const httplib::Request & req, httplib::Response & res) {
-    res.set_content("Not implemented", "text/plain");
   };
 
   auto status_handler = [](const httplib::Request & req, httplib::Response & res) {
@@ -86,7 +82,6 @@ int main(int argc, char ** argv) {
 
   svr.Get("/translate", translate_handler);
   svr.Post("/translate", translate_handler);
-  svr.Get("/search", search_handler);
   svr.Get("/status", status_handler);
 
   svr.Get("/index.html", [](const httplib::Request & req, httplib::Response & res) {
