@@ -28,7 +28,7 @@ Place lid.176.ftz in assets directory (download link: https://fasttext.cc/docs/e
 Place each language model in the assets directory in $SOURCELANG/$TARGETLANG subdirectory. New models can be downloaded from https://github.com/Helsinki-NLP/Opus-MT-train/tree/master/models and must be added to MarianTranslator.cpp and TranslationContext.cpp
 
 | Source | Target | Model | Bleu (Tatoeba) |
-| - | - | - | |
+| - | - | - | - |
 | en | fi | [opus+bt-2020-02-26.zip](https://object.pouta.csc.fi/OPUS-MT-models/en-fi/opus+bt-2020-02-26.zip) | 41.4 |
 | fi | en | [opus-2020-02-13.zip](https://object.pouta.csc.fi/OPUS-MT-models/fi-en/opus-2020-02-13.zip) | 57.4 |
 | fi | ru | [opus-2020-04-12.zip](https://object.pouta.csc.fi/OPUS-MT-models/fi-ru/opus-2020-04-12.zip) | 46.3 |
