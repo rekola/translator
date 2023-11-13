@@ -36,7 +36,7 @@ Place each language model in the assets directory in $SOURCELANG/$TARGETLANG sub
 | et | en | [opus-2019-12-18.zip](https://object.pouta.csc.fi/OPUS-MT-models/et-en/opus-2019-12-18.zip) | 59.9 |
 | ru | en | [opus-2020-02-26.zip](https://object.pouta.csc.fi/OPUS-MT-models/ru-en/opus-2020-02-26.zip) | 61.1 |
 | de | en | [opus-2020-02-26.zip](https://object.pouta.csc.fi/OPUS-MT-models/de-en/opus-2020-02-26.zip) | 55.4 |
-| uk | en | ? | ? |
+| uk | en |  [opus-2020-01-16.zip](https://object.pouta.csc.fi/OPUS-MT-models/uk-en/opus-2020-01-16.zip) | 64.1 |
 
 #### BLEU Score Interpretation
 
