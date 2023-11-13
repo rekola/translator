@@ -25,6 +25,30 @@ Place lid.176.ftz in assets directory (download link: https://fasttext.cc/docs/e
 
 ### Hardcoded language models
 
+Place each language model in the assets directory in $SOURCELANG/$TARGETLANG subdirectory. New models can be downloaded from https://github.com/Helsinki-NLP/Opus-MT-train/tree/master/models and must be added to MarianTranslator.cpp and TranslationContext.cpp
+
+| Source | Target | Model | Bleu (Tatoeba) |
+| - | - | - | |
+| en | fi | [opus+bt-2020-02-26.zip](https://object.pouta.csc.fi/OPUS-MT-models/en-fi/opus+bt-2020-02-26.zip) | 41.4 |
+| fi | en | [opus-2020-02-13.zip](https://object.pouta.csc.fi/OPUS-MT-models/fi-en/opus-2020-02-13.zip) | 57.4 |
+| fi | ru | [opus-2020-04-12.zip](https://object.pouta.csc.fi/OPUS-MT-models/fi-ru/opus-2020-04-12.zip) | 46.3 |
+| sv | en | [opus-2020-02-26.zip](https://object.pouta.csc.fi/OPUS-MT-models/sv-en/opus-2020-02-26.zip) | 64.5 |
+| et | en | [opus-2019-12-18.zip](https://object.pouta.csc.fi/OPUS-MT-models/et-en/opus-2019-12-18.zip) | 59.9 |
+| ru | en | [opus-2020-02-26.zip](https://object.pouta.csc.fi/OPUS-MT-models/ru-en/opus-2020-02-26.zip) | 61.1 |
+| de | en | [opus-2020-02-26.zip](https://object.pouta.csc.fi/OPUS-MT-models/de-en/opus-2020-02-26.zip) | 55.4 |
+| uk | en | ? | ? |
+
+#### BLEU Score Interpretation
+
+| BLEU Score | Interpretation                                            |
+|------------|-----------------------------------------------------------|
+| < 10       | Almost useless                                            |
+| 10 - 19    | Hard to get the gist                                      |
+| 20 - 29    | The gist is clear, but has significant grammatical errors |
+| 30 - 40    | Understandable to good translations                       |
+| 40 - 50    | High quality translations                                 |
+| 50 - 60    | Very high quality, adequate, and fluent translations      |
+| > 60       | Quality often better than human                           |
 
 
 ## Installation (Ubuntu)
@@ -84,17 +108,5 @@ Access the url ```http://localhost:8080/translate?q=Hello%20world&target=fi``` t
 
 ## Known issues
 
+- Translation is done one sentence at a time, which leads to suboptimal translations
 - Duplicate parameters are ignored, which means that you cannot translate the same text multiple times.
-
-## BLEU Score Interpretation
-
-| BLEU Score | Interpretation                                            |
-|------------|-----------------------------------------------------------|
-| < 10       | Almost useless                                            |
-| 10 - 19    | Hard to get the gist                                      |
-| 20 - 29    | The gist is clear, but has significant grammatical errors |
-| 30 - 40    | Understandable to good translations                       |
-| 40 - 50    | High quality translations                                 |
-| 50 - 60    | Very high quality, adequate, and fluent translations      |
-| > 60       | Quality often better than human                           |
-
