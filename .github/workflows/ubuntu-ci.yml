@@ -30,7 +30,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt install libutf8proc-dev libopenblas-dev libfmt-dev libfasttext-dev
-	  mkdir build
-	  chdir build
+          mkdir build
+          chdir build
           cmake .. -DCOMPILE_CUDA=off -DCOMPILE_CPU=on
           make
