@@ -59,7 +59,7 @@ Place each language model in the assets directory in $SOURCELANG/$TARGETLANG sub
 ### Install dependencies
 
 ```
-sudo apt install libutf8proc-dev libopenblas-dev fmt-dev libfasttext-dev
+sudo apt install libutf8proc-dev libopenblas-dev libfmt-dev libfasttext-dev
 ```
 
 ### Compilation (CPU)

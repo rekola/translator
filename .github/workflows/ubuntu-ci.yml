@@ -29,6 +29,8 @@ jobs:
       - name: Compilation test
         run: |
           sudo apt update
-          sudo apt install libutf8proc-dev libopenblas-dev fmt-dev libfasttext-dev
-          cmake .
+          sudo apt install libutf8proc-dev libopenblas-dev libfmt-dev libfasttext-dev
+	  mkdir build
+	  chdir build
+          cmake .. -DCOMPILE_CUDA=off -DCOMPILE_CPU=on
           make
