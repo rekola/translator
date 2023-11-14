@@ -1,5 +1,8 @@
 # translator
 
+[![CI](https://github.com/rekola/translator/workflows/Ubuntu-CI/badge.svg)]()
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+
 Machine Translation Service based on MarianNMT. The project is a
 microservice that contains a web server that provides a REST based
 HTTP API for machine translation. FastText is used for input language
@@ -36,7 +39,7 @@ Place each language model in the assets directory in $SOURCELANG/$TARGETLANG sub
 | et | en | [opus-2019-12-18.zip](https://object.pouta.csc.fi/OPUS-MT-models/et-en/opus-2019-12-18.zip) | 59.9 |
 | ru | en | [opus-2020-02-26.zip](https://object.pouta.csc.fi/OPUS-MT-models/ru-en/opus-2020-02-26.zip) | 61.1 |
 | de | en | [opus-2020-02-26.zip](https://object.pouta.csc.fi/OPUS-MT-models/de-en/opus-2020-02-26.zip) | 55.4 |
-| uk | en |  [opus-2020-01-16.zip](https://object.pouta.csc.fi/OPUS-MT-models/uk-en/opus-2020-01-16.zip) | 64.1 |
+| uk | en | [opus-2020-01-16.zip](https://object.pouta.csc.fi/OPUS-MT-models/uk-en/opus-2020-01-16.zip) | 64.1 |
 
 #### BLEU Score Interpretation
 
