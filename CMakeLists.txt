@@ -49,22 +49,9 @@ add_executable(translator
 	src/MarianTranslator.cpp
 	src/LanguageDetector.cpp
 	src/Tokenizer.cpp
-	3rd_party/fastText/src/fasttext.cc
-	3rd_party/fastText/src/matrix.cc
-	3rd_party/fastText/src/dictionary.cc
-	3rd_party/fastText/src/loss.cc
-	3rd_party/fastText/src/productquantizer.cc
-	3rd_party/fastText/src/densematrix.cc
-	3rd_party/fastText/src/quantmatrix.cc
-	3rd_party/fastText/src/vector.cc
-	3rd_party/fastText/src/model.cc
-	3rd_party/fastText/src/utils.cc
-	3rd_party/fastText/src/args.cc
-	3rd_party/fastText/src/meter.cc
 )
 
-
-target_link_libraries(translator m fmt pthread utf8proc marian)
+target_link_libraries(translator m fmt pthread utf8proc marian fasttext)
 
 target_include_directories(translator
   PUBLIC src/
