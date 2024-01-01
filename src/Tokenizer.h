@@ -1,3 +1,5 @@
+// Text tokenizer. Used for language detection. Translators provide their own methods for tokenization.
+
 #ifndef _TOKENIZER_H_
 #define _TOKENIZER_H_
 
@@ -20,7 +22,7 @@ class Tokenizer {
   void setLinkMode(LinkMode m) { link_mode_ = m; }
   void stripEndings(bool t) { strip_endings_ = t; }
   void skipWhitespace(bool t) { skip_whitespace_ = t; }
-			
+  
  protected:
   void initialize();
 

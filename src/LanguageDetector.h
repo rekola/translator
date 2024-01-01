@@ -1,3 +1,5 @@
+// LanguageDetector is used to pick the correct source language if one is not provided.
+
 #ifndef _LANGUAGEDETECTOR_H_
 #define _LANGUAGEDETECTOR_H_
 

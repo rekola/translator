@@ -1,3 +1,5 @@
+// Various text processing utils
+
 #ifndef _TRANSLATOR_TEXT_UTILS_H_
 #define _TRANSLATOR_TEXT_UTILS_H_
 

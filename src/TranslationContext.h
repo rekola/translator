@@ -1,3 +1,7 @@
+// TranslationContext is a singleton class, that keeps track of
+// Translator instances for different language pairs and provides
+// translate() method for translating text. Thread-safe.
+
 #ifndef _TRANSLATIONCONTEXT_H_
 #define _TRANSLATIONCONTEXT_H_
 

@@ -1,10 +1,12 @@
+// Marian-NMT based Translator
+
 #ifndef _MARIANTRANSLATOR_H_
 #define _MARIANTRANSLATOR_H_
 
 #include "Translator.h"
 
-#include "marian.h"                                                                           
-#include "translator/beam_search.h"                                                           
+#include "marian.h"
+#include "translator/beam_search.h"
 #include "translator/translator.h"
 #include "sentencepiece/src/sentencepiece_processor.h"
 
