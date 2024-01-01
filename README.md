@@ -6,7 +6,9 @@
 Machine Translation Service based on MarianNMT. The project is a
 microservice that contains a web server that provides a REST based
 HTTP API for machine translation. FastText is used for input language
-detection. This is a work in progress.
+detection. This is a work in progress. The software is not yet
+multi-threaded, so translation tasks block the server for their
+duration.
 
 ## Dependencies
 
